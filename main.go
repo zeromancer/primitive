@@ -26,6 +26,7 @@ var (
 	OutputSize int
 	Mode       int
 	Workers    int
+	Max        float64
 	Nth        int
 	Repeat     int
 	V, VV      bool
@@ -71,6 +72,7 @@ func init() {
 	flag.IntVar(&OutputSize, "s", 1024, "output image size")
 	flag.IntVar(&Mode, "m", 1, "0=combo 1=triangle 2=rect 3=ellipse 4=circle 5=rotatedrect 6=beziers 7=rotatedellipse 8=polygon")
 	flag.IntVar(&Workers, "j", 0, "number of parallel workers (default uses all cores)")
+	flag.Float64Var(&Max, "ma", 0, "target score to stop adding primitives (default 0)")
 	flag.IntVar(&Nth, "nth", 1, "save every Nth frame (put \"%d\" in path)")
 	flag.IntVar(&Repeat, "rep", 0, "add N extra shapes per iteration with reduced search")
 	flag.BoolVar(&V, "v", false, "verbose")
@@ -178,7 +180,7 @@ func main() {
 				saveFrames := percent && ext != ".gif"
 				saveFrames = saveFrames && frame%Nth == 0
 				last := j == len(Configs)-1 && i == config.Count-1
-				if saveFrames || last {
+				if saveFrames || last || model.Score <= Max {
 					path := output
 					if percent {
 						path = fmt.Sprintf(output, frame)
@@ -199,6 +201,7 @@ func main() {
 					}
 				}
 			}
+			if model.Score <= Max { return }
 		}
 	}
 }
