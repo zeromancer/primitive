@@ -30,6 +30,7 @@ var (
 	Nth        int
 	Repeat     int
 	V, VV      bool
+	Round      bool
 )
 
 type flagArray []string
@@ -74,6 +75,7 @@ func init() {
 	flag.IntVar(&Workers, "j", 0, "number of parallel workers (default uses all cores)")
 	flag.Float64Var(&Max, "ma", 0, "target score to stop adding primitives (default 0)")
 	flag.IntVar(&Nth, "nth", 1, "save every Nth frame (put \"%d\" in path)")
+	flag.BoolVar(&Round, "round", false, "generate a round image instead of a square (default false)")
 	flag.IntVar(&Repeat, "rep", 0, "add N extra shapes per iteration with reduced search")
 	flag.BoolVar(&V, "v", false, "verbose")
 	flag.BoolVar(&VV, "vv", false, "very verbose")
@@ -155,7 +157,7 @@ func main() {
 	}
 
 	// run algorithm
-	model := primitive.NewModel(input, bg, OutputSize, Workers)
+	model := primitive.NewModel(input, bg, OutputSize, Workers, Round)
 	primitive.Log(1, "%d: t=%.3f, score=%.6f\n", 0, 0.0, model.Score)
 	start := time.Now()
 	frame := 0

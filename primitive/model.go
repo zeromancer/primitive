@@ -20,9 +20,10 @@ type Model struct {
 	Colors     []Color
 	Scores     []float64
 	Workers    []*Worker
+	Round      bool
 }
 
-func NewModel(target image.Image, background Color, size, numWorkers int) *Model {
+func NewModel(target image.Image, background Color, size, numWorkers int, round bool) *Model {
 	w := target.Bounds().Size().X
 	h := target.Bounds().Size().Y
 	aspect := float64(w) / float64(h)
@@ -51,6 +52,7 @@ func NewModel(target image.Image, background Color, size, numWorkers int) *Model
 		worker := NewWorker(model.Target)
 		model.Workers = append(model.Workers, worker)
 	}
+	model.Round = round
 	return model
 }
 
@@ -89,7 +91,11 @@ func (model *Model) SVG() string {
 	lines = append(lines, fmt.Sprintf("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 %d %d\">", model.Sw, model.Sh))
 	lines = append(lines, "<defs>")
 	lines = append(lines, "<clipPath id=\"viewClip\">")
-	lines = append(lines, fmt.Sprintf("<rect x=\"0\" y=\"0\" width=\"%d\" height=\"%d\" />", model.Sw, model.Sh))
+	if model.Round {
+		lines = append(lines, fmt.Sprintf("<ellipse cx=\"%d\" cy=\"%d\" rx=\"%d\" ry=\"%d\" />", model.Sw/2, model.Sh/2, model.Sw/2, model.Sh/2))
+	} else {
+		lines = append(lines, fmt.Sprintf("<rect x=\"0\" y=\"0\" width=\"%d\" height=\"%d\" />", model.Sw, model.Sh))
+	}
 	lines = append(lines, "</clipPath>")
 	lines = append(lines, "</defs>")
 	lines = append(lines, fmt.Sprintf("<rect x=\"0\" y=\"0\" width=\"%d\" height=\"%d\" fill=\"#%02x%02x%02x\"  clip-path=\"url(#viewClip)\" />", model.Sw, model.Sh, bg.R, bg.G, bg.B))
