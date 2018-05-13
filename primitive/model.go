@@ -93,15 +93,13 @@ func (model *Model) SVG() string {
 	lines = append(lines, "</clipPath>")
 	lines = append(lines, "</defs>")
 	lines = append(lines, fmt.Sprintf("<rect x=\"0\" y=\"0\" width=\"%d\" height=\"%d\" fill=\"#%02x%02x%02x\"  clip-path=\"url(#viewClip)\" />", model.Sw, model.Sh, bg.R, bg.G, bg.B))
-	lines = append(lines, "<g clip-path=\"url(#viewClip)\">")
-	lines = append(lines, fmt.Sprintf("<g transform=\"scale(%f) translate(0.5 0.5)\">", model.Scale))
+	lines = append(lines, fmt.Sprintf("<g clip-path=\"url(#viewClip)\" transform=\"scale(%f) translate(0.5 0.5)\">", model.Scale))
 	for i, shape := range model.Shapes {
 		c := model.Colors[i]
 		attrs := "fill=\"#%02x%02x%02x\" fill-opacity=\"%f\""
 		attrs = fmt.Sprintf(attrs, c.R, c.G, c.B, float64(c.A)/255)
 		lines = append(lines, shape.SVG(attrs))
 	}
-	lines = append(lines, "</g>")
 	lines = append(lines, "</g>")
 	lines = append(lines, "</svg>")
 	return strings.Join(lines, "\n")
